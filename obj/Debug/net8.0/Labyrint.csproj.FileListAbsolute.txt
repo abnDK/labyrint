@@ -1,0 +1,14 @@
+/Users/andersbusk/Programming/Labyrint/bin/Debug/net8.0/Labyrint
+/Users/andersbusk/Programming/Labyrint/bin/Debug/net8.0/Labyrint.deps.json
+/Users/andersbusk/Programming/Labyrint/bin/Debug/net8.0/Labyrint.runtimeconfig.json
+/Users/andersbusk/Programming/Labyrint/bin/Debug/net8.0/Labyrint.dll
+/Users/andersbusk/Programming/Labyrint/bin/Debug/net8.0/Labyrint.pdb
+/Users/andersbusk/Programming/Labyrint/obj/Debug/net8.0/Labyrint.GeneratedMSBuildEditorConfig.editorconfig
+/Users/andersbusk/Programming/Labyrint/obj/Debug/net8.0/Labyrint.AssemblyInfoInputs.cache
+/Users/andersbusk/Programming/Labyrint/obj/Debug/net8.0/Labyrint.AssemblyInfo.cs
+/Users/andersbusk/Programming/Labyrint/obj/Debug/net8.0/Labyrint.csproj.CoreCompileInputs.cache
+/Users/andersbusk/Programming/Labyrint/obj/Debug/net8.0/Labyrint.dll
+/Users/andersbusk/Programming/Labyrint/obj/Debug/net8.0/refint/Labyrint.dll
+/Users/andersbusk/Programming/Labyrint/obj/Debug/net8.0/Labyrint.pdb
+/Users/andersbusk/Programming/Labyrint/obj/Debug/net8.0/Labyrint.genruntimeconfig.cache
+/Users/andersbusk/Programming/Labyrint/obj/Debug/net8.0/ref/Labyrint.dll
