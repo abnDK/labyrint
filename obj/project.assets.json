@@ -1,36 +1,38 @@
 {
   "version": 3,
   "targets": {
-    "net8.0": {}
+    "net7.0": {}
   },
   "libraries": {},
   "projectFileDependencyGroups": {
-    "net8.0": []
+    "net7.0": []
   },
   "packageFolders": {
-    "/Users/andersbusk/.nuget/packages/": {}
+    "C:\\Users\\andni\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/andersbusk/Programming/Labyrint/Labyrint.csproj",
+      "projectUniqueName": "C:\\svn\\PersonalProjects\\Labyrint\\labyrint\\Labyrint.csproj",
       "projectName": "Labyrint",
-      "projectPath": "/Users/andersbusk/Programming/Labyrint/Labyrint.csproj",
-      "packagesPath": "/Users/andersbusk/.nuget/packages/",
-      "outputPath": "/Users/andersbusk/Programming/Labyrint/obj/",
+      "projectPath": "C:\\svn\\PersonalProjects\\Labyrint\\labyrint\\Labyrint.csproj",
+      "packagesPath": "C:\\Users\\andni\\.nuget\\packages\\",
+      "outputPath": "C:\\svn\\PersonalProjects\\Labyrint\\labyrint\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/andersbusk/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\andni\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
-        "net8.0"
+        "net7.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net8.0": {
-          "targetAlias": "net8.0",
+        "net7.0": {
+          "targetAlias": "net7.0",
           "projectReferences": {}
         }
       },
@@ -41,8 +43,8 @@
       }
     },
     "frameworks": {
-      "net8.0": {
-        "targetAlias": "net8.0",
+      "net7.0": {
+        "targetAlias": "net7.0",
         "imports": [
           "net461",
           "net462",
@@ -59,7 +61,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.100/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.302\\RuntimeIdentifierGraph.json"
       }
     }
   }

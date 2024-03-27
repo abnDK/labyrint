@@ -1,0 +1,15 @@
+C:\svn\PersonalProjects\Labyrint\labyrint\obj\Debug\net7.0\Labyrint.csproj.AssemblyReference.cache
+C:\svn\PersonalProjects\Labyrint\labyrint\obj\Debug\net7.0\Labyrint.GeneratedMSBuildEditorConfig.editorconfig
+C:\svn\PersonalProjects\Labyrint\labyrint\obj\Debug\net7.0\Labyrint.AssemblyInfoInputs.cache
+C:\svn\PersonalProjects\Labyrint\labyrint\obj\Debug\net7.0\Labyrint.AssemblyInfo.cs
+C:\svn\PersonalProjects\Labyrint\labyrint\obj\Debug\net7.0\Labyrint.csproj.CoreCompileInputs.cache
+C:\svn\PersonalProjects\Labyrint\labyrint\bin\Debug\net7.0\Labyrint.exe
+C:\svn\PersonalProjects\Labyrint\labyrint\bin\Debug\net7.0\Labyrint.deps.json
+C:\svn\PersonalProjects\Labyrint\labyrint\bin\Debug\net7.0\Labyrint.runtimeconfig.json
+C:\svn\PersonalProjects\Labyrint\labyrint\bin\Debug\net7.0\Labyrint.dll
+C:\svn\PersonalProjects\Labyrint\labyrint\bin\Debug\net7.0\Labyrint.pdb
+C:\svn\PersonalProjects\Labyrint\labyrint\obj\Debug\net7.0\Labyrint.dll
+C:\svn\PersonalProjects\Labyrint\labyrint\obj\Debug\net7.0\refint\Labyrint.dll
+C:\svn\PersonalProjects\Labyrint\labyrint\obj\Debug\net7.0\Labyrint.pdb
+C:\svn\PersonalProjects\Labyrint\labyrint\obj\Debug\net7.0\Labyrint.genruntimeconfig.cache
+C:\svn\PersonalProjects\Labyrint\labyrint\obj\Debug\net7.0\ref\Labyrint.dll

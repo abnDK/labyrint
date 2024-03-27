@@ -44,14 +44,14 @@ public class Block : ICloneable
     public object Clone()
     {
         Block clone = new Block(X, Y, Name);
-        clone.Sides = Sides;
+        clone.Sides = (Sides)Sides.Clone();
         clone.Connected = false;
         return clone;
     }
 
 }
 
-public class Sides
+public class Sides : ICloneable
 {
     public bool Top;
 
@@ -117,9 +117,19 @@ public class Sides
 
     }
 
-    public string Show()
+    public override string ToString()
     {
         return $"{(Left ? "<" : " ")}{(Top && Bottom ? "H" : Top ? "A" : Bottom ? "V" : " ")}{(Right ? ">" : " ")}";
+    }
+
+    public object Clone()
+    {
+        Sides clonedSides = new Sides();
+        clonedSides.Top = this.Top;
+        clonedSides.Bottom = this.Bottom;
+        clonedSides.Left = this.Left;
+        clonedSides.Right = this.Right;
+        return clonedSides;
     }
 
 

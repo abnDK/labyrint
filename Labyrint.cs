@@ -3,11 +3,11 @@ public class Labyrint
 {
     public Board Board { get; init; }
 
-    private Pathfinder Pathfinder { get; }
+    private Pathfinder Pathfinder { get; } = new();
 
     public Labyrint()
     {
-        Board = new Board(6);
+        Board = new Board(3);
 
     }
 

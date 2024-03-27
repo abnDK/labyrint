@@ -25,62 +25,50 @@ public class Pathfinder
         return (false, null);
     }
 
-    public static (List<Board> boards, bool bruteForce) FindGoalForce(string startPos, string goalPos, List<Board> baseBoards, List<Board> candidates)
+    public static List<Board>FindGoalForce(string startPos, string goalPos, Board motherBoard)
     {
         // boards: A list of boards from start board to final board where goal can be reached
         // insertsNeeded: How many inserts are needed before goal becomes reachable
         // bruteForce: if true, all versions will be used for next gen, if false, only versions with lower straightdistance between available area and goal is used for next gen
 
+        Queue<(Board board, List<Board> ancestors)> candidates = new Queue<(Board board, List<Board> ancestors)>();
 
-        // THIS DOES DFS - WE WANT BFS... 
-        // maybe make function without candidates, and instead add poteentialnextgenerations to list we iterate over
-        // list get populated with new generations, if candidate doesnt result in hit
-        // but somehow, new generations should have their ancestor/candidate prepended!??
+        candidates.Enqueue((motherBoard, new List<Board>()));
 
-        foreach (Board candidate in candidates)
+        while (candidates.Any())
         {
+            var (candidate, ancestors)  = candidates.Dequeue();
+
             (bool goalFound, int? stepsNeeded) result = FindGoal(startPos, goalPos, candidate);
 
             if (result.goalFound)
             {
 
-                baseBoards.Add(candidate);
+                ancestors.Add(candidate);
 
-                return (baseBoards, true);
+                return ancestors;
             }
-            else
+
+            Console.WriteLine($"Calculation generation {ancestors.Count()}");
+
+            if (ancestors.Count() > 10000) throw new Exception("Too many generations...");
+
+            List<Board> newGenerations = candidate.PotentialNewGenerations();
+
+            foreach (Board newGen in newGenerations)
             {
-                List<Board> potentialNewGenerations = candidate.PotentialNewGenerations();
 
-                List<Board> nextGenBaseBoards = new List<Board>();
-                nextGenBaseBoards.AddRange(baseBoards);
-                nextGenBaseBoards.Add(candidate);
+                newGen.renderField();
 
-                return FindGoalForce(startPos, goalPos, nextGenBaseBoards, potentialNewGenerations);
+                List<Board> newGenAncestors = ancestors;
+                newGenAncestors.Add(newGen);
 
+                candidates.Enqueue((newGen, newGenAncestors));
             }
 
-
         }
 
-        foreach (Board candidate in newCandidates)
-        {
-            List<Board> nextGenBaseBoards = baseBoards;
-            nextGenBaseBoards.Add(candidate);
-            FindGoalForce(startPos, goalPos, nextGenBaseBoards, )
-        }
-
-        // check rows reverse and add to boardsToDijkstra
-
-        // Check columns regular and add to boardsToDijkstra
-
-        // check columns reverse and add to boardsToDijkstra
-
-        // for each candidate board, recursive call FindGoalForce with candidate added to boards.
-
-
-        return (boardsToDijkstra, 0, false);
-
+        throw new Exception("How did we end up here?");
 
     }
 
