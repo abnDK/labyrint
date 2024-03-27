@@ -10,7 +10,7 @@ public class Board : ICloneable
 
     public Board(int size)
     {
-        if (size % 2 == 0)      
+        if (size % 2 == 0)
         {
             // can only build fields of uneven size in order to keep outer rows/columns fixed.
             size++;
@@ -23,7 +23,7 @@ public class Board : ICloneable
     private List<List<Block>> initField(int size)
     {
 
-        
+
 
         List<List<Block>> newField = new List<List<Block>>();
 
@@ -248,14 +248,6 @@ public class Board : ICloneable
 
             for (int orientationIndex = 0; orientationIndex < 4; orientationIndex++)
             {
-                
-                var clonedBoard = (Board)this.Clone();
-
-                clonedBoard.Field[0][0].X = 500;
-
-                var originalBoard = this;
-
-                Console.WriteLine($"Avail: {AvailableBlock.Sides.ToString()}");
 
                 Board insertFromTopBoard = (Board)this.Clone();
                 insertFromTopBoard.insertBlockIntoColumn(index, false);
@@ -263,19 +255,19 @@ public class Board : ICloneable
                 insertFromTopBoard.renderField();
                 Console.WriteLine(insertFromTopBoard.AvailableBlock.Sides.ToString());
 
-                Board insertFromBottomBoard = (Board)Clone(); // when this is cloned, it seem it is cloning the board we just manipulated in line 250 - why? It seems that somewhere in the insert function, it writes to the same object that originally was used.
+                Board insertFromBottomBoard = (Board)this.Clone(); // when this is cloned, it seem it is cloning the board we just manipulated in line 250 - why? It seems that somewhere in the insert function, it writes to the same object that originally was used.
                 insertFromBottomBoard.insertBlockIntoColumn(index, true);
                 newGenerations.Add(insertFromBottomBoard);
                 insertFromBottomBoard.renderField();
                 Console.WriteLine(insertFromBottomBoard.AvailableBlock.Sides.ToString());
 
-                Board insertFromLeftBoard = (Board)Clone();
+                Board insertFromLeftBoard = (Board)this.Clone();
                 insertFromLeftBoard.insertBlockIntoRow(index, false);
                 newGenerations.Add(insertFromLeftBoard);
                 insertFromLeftBoard.renderField();
                 Console.WriteLine(insertFromLeftBoard.AvailableBlock.Sides.ToString());
 
-                Board insertFromRightBoard = (Board)Clone();
+                Board insertFromRightBoard = (Board)this.Clone();
                 insertFromRightBoard.insertBlockIntoRow(index, true);
                 newGenerations.Add(insertFromRightBoard);
                 insertFromRightBoard.renderField();
@@ -286,6 +278,11 @@ public class Board : ICloneable
             }
 
 
+        }
+
+        foreach (Board b in newGenerations)
+        {
+            Console.WriteLine(b.AvailableBlock.Name);
         }
 
         return newGenerations;
@@ -315,17 +312,14 @@ public class Board : ICloneable
         for (int row = 0; row < Field.Count; row++)
         {
 
-            
-
             for (int column = 0; column < Field[row].Count(); column++)
             {
                 clonedBoard.Field[row][column] = (Block)this.Field[row][column].Clone();
             }
         }
-        clonedBoard.Field = this.Field;
 
         // clone available block
-        clonedBoard.AvailableBlock = this.AvailableBlock;
+        clonedBoard.AvailableBlock = (Block)this.AvailableBlock.Clone();
 
         // mark it as cloned
         clonedBoard.Name = "Cloned";

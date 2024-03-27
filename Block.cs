@@ -43,7 +43,7 @@ public class Block : ICloneable
 
     public object Clone()
     {
-        Block clone = new Block(X, Y, Name);
+        Block clone = new Block(X, Y, $"{Name} - cloned");
         clone.Sides = (Sides)Sides.Clone();
         clone.Connected = false;
         return clone;

@@ -8,4 +8,6 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = Labyrint
-build_property.ProjectDir = c:\svn\PersonalProjects\Labyrint\labyrint\
+build_property.ProjectDir = /Users/andersbusk/Programming/Labyrint/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
