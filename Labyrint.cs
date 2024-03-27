@@ -7,29 +7,26 @@ public class Labyrint
 
     public Labyrint()
     {
-        Board = new Board(3);
+        Board = new Board(5);
 
     }
 
-    public (bool goalFound, int? stepsNeeded) SearchGoal(string startPos, string goalPos)
+    public (bool goalFound, int stepsNeeded, int distanceFromGoal) SearchGoal(string startPos, string goalPos)
     {
-        (bool goalFound, int? stepsNeeded) result = Pathfinder.FindGoal(startPos, goalPos, Board);
+        (bool goalFound, int stepsNeeded, int distanceFromGoal) result = Pathfinder.FindGoal(startPos, goalPos, Board);
 
-        Console.WriteLine(result);
-        if (result.goalFound)
-        {
-            return result;
-        }
-        else
-        {
-            return (false, null);
-        }
+        return result;
+
 
     }
 
     public void SearchGoalForce(string startPos, string goalPos)
     {
-        Pathfinder.FindGoalForce(startPos, goalPos, Board);
+        List<Board> results = Pathfinder.FindGoalForce(startPos, goalPos, Board);
+        foreach (Board b in results)
+        {
+            b.renderField();
+        }
     }
 
 }

@@ -1,8 +1,9 @@
 using System.Linq;
+using System.Xml.XPath;
 
 public class Pathfinder
 {
-    public static (bool goalFound, int? stepsNeeded) FindGoal(string startPos, string goalPos, Board board)
+    public static (bool goalFound, int stepsNeeded, int distanceFromGoal) FindGoal(string startPos, string goalPos, Board board)
     {
 
 
@@ -19,13 +20,15 @@ public class Pathfinder
         if (distances.Where(node => node.Key == goalPos).ToList().Count() > 0)
         {
             Console.WriteLine("GOAL REACHED!");
-            return (true, distances.Where(node => node.Key == goalPos).Select(node => node.Value.distance).First());
+            return (true, distances.Where(node => node.Key == goalPos).Select(node => node.Value.distance).First(), 0);
         }
 
-        return (false, null);
+        return (false,
+                distances.Where(node => node.Value.distanceFromGoal == distances.Min(node => node.Value.distanceFromGoal)).Select(node => node.Value.distance).First(),
+                distances.Min(node => node.Value.distanceFromGoal));
     }
 
-    public static List<Board>FindGoalForce(string startPos, string goalPos, Board motherBoard)
+    public static List<Board> FindGoalForce(string startPos, string goalPos, Board motherBoard)
     {
         // boards: A list of boards from start board to final board where goal can be reached
         // insertsNeeded: How many inserts are needed before goal becomes reachable
@@ -35,15 +38,20 @@ public class Pathfinder
 
         candidates.Enqueue((motherBoard, new List<Board>()));
 
+        int candidateNum = 0;
+
         while (candidates.Any())
         {
-            var (candidate, ancestors)  = candidates.Dequeue();
+            var (candidate, ancestors) = candidates.Dequeue();
 
-            (bool goalFound, int? stepsNeeded) result = FindGoal(startPos, goalPos, candidate);
+            candidateNum++;
+            Console.WriteLine($"Calculating candidate n. {candidateNum}");
+
+
+            (bool goalFound, int stepsNeeded, int distanceFromGoal) result = FindGoal(startPos, goalPos, candidate);
 
             if (result.goalFound)
             {
-
                 ancestors.Add(candidate);
 
                 return ancestors;
@@ -51,20 +59,28 @@ public class Pathfinder
 
             Console.WriteLine($"Calculation generation {ancestors.Count()}");
 
-            if (ancestors.Count() > 10000) throw new Exception("Too many generations...");
+            if (candidate.Generation > 3) throw new Exception("Too many generations...");
 
-            List<Board> newGenerations = candidate.PotentialNewGenerations();
+
+            List<Board> newGenerations = candidate.NewGenerations();
+
+            // new generation get candidate as ancestor.
+            // if we let it be a ref, it can work as linked list. Ancestor has ancestor.
 
             foreach (Board newGen in newGenerations)
             {
 
-                newGen.renderField();
+                List<Board> newGenAncestors = new List<Board>();
 
-                List<Board> newGenAncestors = ancestors;
-                newGenAncestors.Add(newGen);
-
+                foreach (Board ancestor in ancestors)
+                {
+                    newGenAncestors.Add((Board)ancestor.Clone(false));
+                }
+                newGenAncestors.Add(candidate);
                 candidates.Enqueue((newGen, newGenAncestors));
+
             }
+
 
         }
 

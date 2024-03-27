@@ -13,7 +13,7 @@ public class Program
 
         l.Board.renderField();
 
-        l.SearchGoalForce("0,0", "2,2");
+        l.SearchGoalForce("1,1", "3,3");
 
 
 
