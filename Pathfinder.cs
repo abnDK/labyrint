@@ -3,10 +3,8 @@ using System.Xml.XPath;
 
 public class Pathfinder
 {
-    public static (bool goalFound, int stepsNeeded, int distanceFromGoal) FindGoal(string startPos, string goalPos, Board board)
+    public static (bool goalFound, string closestPosition, int stepsNeeded, int distanceFromGoal) FindGoal(string startPos, string goalPos, Board board)
     {
-
-
         Dictionary<string, (int distance, string previousPosition, int distanceFromGoal)> distances; // position in format "x,y" and distance as integer and position in format "x,y" of previous node
 
         distances = DoDijkstra(startPos, goalPos, board);
@@ -20,10 +18,14 @@ public class Pathfinder
         if (distances.Where(node => node.Key == goalPos).ToList().Count() > 0)
         {
             Console.WriteLine("GOAL REACHED!");
-            return (true, distances.Where(node => node.Key == goalPos).Select(node => node.Value.distance).First(), 0);
+            return (true,
+                    distances.Where(node => node.Value.distanceFromGoal == distances.Min(node => node.Value.distanceFromGoal)).Select(node => node.Key).First(),
+                    distances.Where(node => node.Key == goalPos).Select(node => node.Value.distance).First(),
+                    0);
         }
 
         return (false,
+                distances.Where(node => node.Value.distanceFromGoal == distances.Min(node => node.Value.distanceFromGoal)).Select(node => node.Key).First(),
                 distances.Where(node => node.Value.distanceFromGoal == distances.Min(node => node.Value.distanceFromGoal)).Select(node => node.Value.distance).First(),
                 distances.Min(node => node.Value.distanceFromGoal));
     }
@@ -34,19 +36,53 @@ public class Pathfinder
         // insertsNeeded: How many inserts are needed before goal becomes reachable
         // bruteForce: if true, all versions will be used for next gen, if false, only versions with lower straightdistance between available area and goal is used for next gen
 
-        Queue<(Board board, List<Board> ancestors)> candidates = new Queue<(Board board, List<Board> ancestors)>();
+        Queue<(Board board, string closestPosition, int distanceFromGoal, List<(Board, string, int)> ancestors)> candidates = new Queue<(Board board, List<(Board board, string closestPosition, int distanceFromGoal)> ancestors)>();
 
-        candidates.Enqueue((motherBoard, new List<Board>()));
+        candidates.Enqueue((motherBoard, "0,0", motherBoard.Field.Count() * 2, new List<(Board board, string closestPosition, int distanceFromGoal)>()));
 
         int candidateNum = 0;
 
         while (candidates.Any())
         {
-            var (candidate, ancestors) = candidates.Dequeue();
+            var (candidate, candidateClosestPosition, candidateDistanceFromGoal, ancestors) = candidates.Dequeue();
 
             candidateNum++;
             Console.WriteLine($"Calculating candidate n. {candidateNum}");
 
+            List<Board> newGenerations = candidate.NewGenerations();
+
+            foreach (Board newGen in newGenerations)
+            {
+
+                (bool goalFound, string closestPosition, int stepsNeeded, int distanceFromGoal) newGenResult = FindGoal(startPos, goalPos, newGen);
+
+                if (newGenResult.goalFound)
+                {
+                    ancestors.Add((newGen, newGenResult.closestPosition, newGenResult.distanceFromGoal));
+
+                    return ancestors; // fix return value
+                }
+
+                if (candidateDistanceFromGoal > newGenResult.distanceFromGoal)
+                {
+                    List<Board> newGenAncestors = new List<Board>();
+
+                    foreach (Board ancestor in ancestors)
+                    {
+                        newGenAncestors.Add((Board)ancestor.Clone(false));
+                    }
+
+                    newGenAncestors.Add(candidate);
+
+                    // hvorfor? Format passer da når vi dequer på linje 47?
+                    candidates.Enqueue((newGen, candidateClosestPosition, candidateDistanceFromGoal, newGenAncestors));
+                }
+
+
+
+
+
+            }
 
             (bool goalFound, int stepsNeeded, int distanceFromGoal) result = FindGoal(startPos, goalPos, candidate);
 
