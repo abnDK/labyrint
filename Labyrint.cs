@@ -1,26 +1,29 @@
-
-public class Labyrint
+namespace Labyrint
 {
-    public Board Board { get; init; }
 
-    private Pathfinder Pathfinder { get; init; }
-
-    public Labyrint()
+    public class Labyrint
     {
-        Board = new Board(9);
-        Pathfinder = new Pathfinder();
-    }
+        public Board Board { get; init; }
 
+        private Pathfinder Pathfinder { get; init; }
 
-
-    public void SearchGoalForce(string startPos, string goalPos)
-    {
-
-        List<PathFoundBoard> results = Pathfinder.FindGoalForce(startPos, goalPos, Board);
-        foreach (PathFoundBoard pfb in results)
+        public Labyrint()
         {
-            pfb.Board.renderField();
+            Board = new Board(9);
+            Pathfinder = new Pathfinder();
         }
-    }
 
+
+
+        public void SearchGoalForce(string startPos, string goalPos)
+        {
+
+            List<PathFoundBoard> results = Pathfinder.FindGoalForce(startPos, goalPos, Board);
+            foreach (PathFoundBoard pfb in results)
+            {
+                pfb.Board.renderField();
+            }
+        }
+
+    }
 }
