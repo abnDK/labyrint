@@ -1,12 +1,14 @@
-public class Board
+public class Board : ICloneable
 {
     public List<List<Block>> Field { get; set; }
 
-    private int Size { get; init; }
+    public int Size { get; init; }
 
     public Block AvailableBlock { get; private set; } = new(-1, -1, "Initial available block");
 
     public string Name { get; set; } = "Original";
+
+
 
     public int Generation { get; set; }
 
@@ -42,6 +44,32 @@ public class Board
                 newRow.Add(newNode);
             }
         }
+
+        // Setting corner pieces to always be open in x and y direction
+        // TOP LEFT
+        newField[0][0].Sides.Right = true;
+        newField[0][0].Sides.Bottom = true;
+        newField[0][0].Sides.Left = false;
+        newField[0][0].Sides.Top = false;
+
+        // TOP RIGHT
+        newField[0][newField[0].Count() - 1].Sides.Right = false;
+        newField[0][newField[0].Count() - 1].Sides.Bottom = true;
+        newField[0][newField[0].Count() - 1].Sides.Left = true;
+        newField[0][newField[0].Count() - 1].Sides.Top = false;
+
+        // BOTTOM LEFT
+        newField[newField.Count() - 1][0].Sides.Right = true;
+        newField[newField.Count() - 1][0].Sides.Bottom = false;
+        newField[newField.Count() - 1][0].Sides.Left = false;
+        newField[newField.Count() - 1][0].Sides.Top = true;
+
+        // BOTTOM RIGHT
+        newField[newField.Count() - 1][newField[newField.Count() - 1].Count() - 1].Sides.Right = false;
+        newField[newField.Count() - 1][newField[newField.Count() - 1].Count() - 1].Sides.Bottom = false;
+        newField[newField.Count() - 1][newField[newField.Count() - 1].Count() - 1].Sides.Left = true;
+        newField[newField.Count() - 1][newField[newField.Count() - 1].Count() - 1].Sides.Top = true;
+
 
         AvailableBlock = new Block(-1, -1, "initial available block");
 
@@ -102,7 +130,15 @@ public class Board
         return column;
     }
 
-    private void writeColumn(int index, List<Block> column)
+    public List<Block> this[int i]
+    {
+        get { return this.Field[i]; }
+        set { this.Field[i] = value; }
+
+    }
+
+
+    public void writeColumn(int index, List<Block> column)
     {
         for (int i = 0; i < Field.Count; i++)
         {
@@ -238,7 +274,7 @@ public class Board
 
     }
 
-    public List<Board> NewGenerations()
+    public List<Board> CalculateNewGenerations(int? moves = 1)
     {
         List<Board> newGenerations = new List<Board>();
 
@@ -293,7 +329,10 @@ public class Board
 
         return indexes;
     }
-
+    public object Clone()
+    {
+        return 0;
+    }
     public object Clone(bool nextGen)
     {
         Board clonedBoard = new Board(Size);

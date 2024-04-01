@@ -1,12 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ua0LOQfXnmb0NWFfgnhRhBKYWhzN9e90e0X8te+FlWtsx1AJoJ+STGM41AO+viBHQj29LXWFwSGi5I4U1i/dPg==",
+  "dgSpecHash": "YehopDFfY0pSMZ5tYrXYesjFg9Ttyrxl5jJP3xRdg6GPqgL0KAnEbfY3P92ey0mn6boDjY4kn9s09OxZwPyG8Q==",
   "success": true,
   "projectFilePath": "/Users/andersbusk/Programming/Labyrint/Labyrint.csproj",
-  "expectedPackageFiles": [
-    "/Users/andersbusk/.nuget/packages/microsoft.netcore.app.ref/7.0.14/microsoft.netcore.app.ref.7.0.14.nupkg.sha512",
-    "/Users/andersbusk/.nuget/packages/microsoft.aspnetcore.app.ref/7.0.14/microsoft.aspnetcore.app.ref.7.0.14.nupkg.sha512",
-    "/Users/andersbusk/.nuget/packages/microsoft.netcore.app.host.osx-arm64/7.0.14/microsoft.netcore.app.host.osx-arm64.7.0.14.nupkg.sha512"
-  ],
+  "expectedPackageFiles": [],
   "logs": []
 }

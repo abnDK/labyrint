@@ -1,209 +1,184 @@
-using System.Linq;
-using System.Xml.XPath;
+
 
 public class Pathfinder
 {
-    public static (bool goalFound, string closestPosition, int stepsNeeded, int distanceFromGoal) FindGoal(string startPos, string goalPos, Board board)
+    Dijkstra PathFindingAlgo { get; init; }
+
+    public Pathfinder()
+    {
+        PathFindingAlgo = new Dijkstra();
+        // if (PathFindingAlgo == null) throw new Exception("Pathfinder needs a Pathfinding Algo - Cannot be null");
+    }
+
+    public PathFoundBoard FindGoal(string startPos, string goalPos, Board board)
     {
         Dictionary<string, (int distance, string previousPosition, int distanceFromGoal)> distances; // position in format "x,y" and distance as integer and position in format "x,y" of previous node
 
-        distances = DoDijkstra(startPos, goalPos, board);
+        distances = PathFindingAlgo.Search(startPos, goalPos, board);
 
-        foreach (var distance in distances)
-        {
-            Console.WriteLine($"Pos: {distance.Key}");
-            Console.WriteLine($"Dist: {distance.Value.distance}\nPrev: {distance.Value.previousPosition}\nDistFromGoal: {distance.Value.distanceFromGoal}");
-        }
+
 
         if (distances.Where(node => node.Key == goalPos).ToList().Count() > 0)
         {
             Console.WriteLine("GOAL REACHED!");
-            return (true,
-                    distances.Where(node => node.Value.distanceFromGoal == distances.Min(node => node.Value.distanceFromGoal)).Select(node => node.Key).First(),
-                    distances.Where(node => node.Key == goalPos).Select(node => node.Value.distance).First(),
-                    0);
+
+            PathFoundBoard goalReachedBoard = new PathFoundBoard(
+                board, startPos, goalPos,
+                goalPos,
+                distances.Where(node => node.Value.distanceFromGoal == 0).Select(node => node.Value.distance).First(),
+                0
+            );
+
+            return goalReachedBoard;
         }
 
-        return (false,
-                distances.Where(node => node.Value.distanceFromGoal == distances.Min(node => node.Value.distanceFromGoal)).Select(node => node.Key).First(),
-                distances.Where(node => node.Value.distanceFromGoal == distances.Min(node => node.Value.distanceFromGoal)).Select(node => node.Value.distance).First(),
-                distances.Min(node => node.Value.distanceFromGoal));
+        PathFoundBoard closestPathBoard = new PathFoundBoard(
+            board, startPos, goalPos,
+            distances.Where(node => node.Value.distanceFromGoal == distances.Min(node => node.Value.distanceFromGoal)).Select(node => node.Value.previousPosition).First(),
+            distances.Where(node => node.Value.distanceFromGoal == distances.Min(node => node.Value.distanceFromGoal)).Select(node => node.Value.distance).First(),
+            distances.Where(node => node.Value.distanceFromGoal == distances.Min(node => node.Value.distanceFromGoal)).Select(node => node.Value.distanceFromGoal).First()
+
+
+        );
+
+        return closestPathBoard;
     }
 
-    public static List<Board> FindGoalForce(string startPos, string goalPos, Board motherBoard)
+    public List<PathFoundBoard> FindGoalForce(string startPos, string goalPos, Board motherBoard)
     {
         // boards: A list of boards from start board to final board where goal can be reached
         // insertsNeeded: How many inserts are needed before goal becomes reachable
         // bruteForce: if true, all versions will be used for next gen, if false, only versions with lower straightdistance between available area and goal is used for next gen
 
-        Queue<(Board board, string closestPosition, int distanceFromGoal, List<(Board, string, int)> ancestors)> candidates = new Queue<(Board board, List<(Board board, string closestPosition, int distanceFromGoal)> ancestors)>();
+        var candidates = new Queue<(PathFoundBoard pathFoundBoard, List<PathFoundBoard> ancestors)>();
 
-        candidates.Enqueue((motherBoard, "0,0", motherBoard.Field.Count() * 2, new List<(Board board, string closestPosition, int distanceFromGoal)>()));
+        candidates.Enqueue((
+            new PathFoundBoard(motherBoard, startPos, goalPos, startPos, 0, PathFindingAlgo.StraightDistance(startPos, goalPos)),
+            new List<PathFoundBoard>()
+        ));
 
         int candidateNum = 0;
+        int currentGeneration = 0;
+        int limitNextGenAddedToCandidates = 500;
 
         while (candidates.Any())
         {
-            var (candidate, candidateClosestPosition, candidateDistanceFromGoal, ancestors) = candidates.Dequeue();
+            // In this loop we;
+            // each time a new generation is visited (it's BFS, so we go generation 0, generation 1, generetion 2 and so on)
+            // we limit the amount of candidates of a given generation we wanna make new generations from // VAR LIMIT
+            // we dont work with a specific limit of how big a distance the can be to the goal, we just pick the X best amount and continue with that
+            // TODO EXTRAS
+            // we might mix in some random tables?
+            // give version number to a table, so we can track which generation and version in that generation the table is built up of
 
-            candidateNum++;
-            Console.WriteLine($"Calculating candidate n. {candidateNum}");
+            (PathFoundBoard candidate, List<PathFoundBoard> ancestors) = candidates.Dequeue();
 
-            List<Board> newGenerations = candidate.NewGenerations();
-
-            foreach (Board newGen in newGenerations)
+            if (candidate.Board.Generation > currentGeneration)
             {
-
-                (bool goalFound, string closestPosition, int stepsNeeded, int distanceFromGoal) newGenResult = FindGoal(startPos, goalPos, newGen);
-
-                if (newGenResult.goalFound)
-                {
-                    ancestors.Add((newGen, newGenResult.closestPosition, newGenResult.distanceFromGoal));
-
-                    return ancestors; // fix return value
-                }
-
-                if (candidateDistanceFromGoal > newGenResult.distanceFromGoal)
-                {
-                    List<Board> newGenAncestors = new List<Board>();
-
-                    foreach (Board ancestor in ancestors)
-                    {
-                        newGenAncestors.Add((Board)ancestor.Clone(false));
-                    }
-
-                    newGenAncestors.Add(candidate);
-
-                    // hvorfor? Format passer da når vi dequer på linje 47?
-                    candidates.Enqueue((newGen, candidateClosestPosition, candidateDistanceFromGoal, newGenAncestors));
-                }
-
-
-
-
-
+                currentGeneration = candidate.Board.Generation;
+                trimCandidates(limitNextGenAddedToCandidates, ref candidates, currentGeneration);
             }
 
-            (bool goalFound, int stepsNeeded, int distanceFromGoal) result = FindGoal(startPos, goalPos, candidate);
+            // candidat Gen logges
+            // første gang ny generation mødes, regn avg ud for alle med den generation i candidates.
+            // kan bruges når vi filtrerer nye generationer længere nede. Eks kun lade ny generation blive kandidater hvis de er bedre end 25 kvartilen af den nuværende generation.
 
-            if (result.goalFound)
+
+            candidateNum++;
+            if (candidateNum % 25 == 0)
             {
-                ancestors.Add(candidate);
+                Console.WriteLine($"Calculating candidate n. {candidateNum} - Generation n. {candidate.Board.Generation} - Distance from goal {candidate.DistanceFromClosestToGoal} - survival target {ancestors.Last().NextGenSurvivalDistance} - candidates queued {candidates.Count()} - candidates this gen {candidates.Where(c => c.pathFoundBoard.Board.Generation == candidate.Board.Generation).Count()} / next gen {candidates.Where(c => c.pathFoundBoard.Board.Generation == candidate.Board.Generation + 1).Count()}");
+            }
+
+
+
+
+            // Calculate new generations of current candidate
+            List<Board> newGenerationBoards = candidate.Board.CalculateNewGenerations();
+
+            List<PathFoundBoard> newGenerationsPathFoundBoards = new List<PathFoundBoard>();
+
+            newGenerationBoards.ForEach(delegate (Board newGenBoard)
+                {
+                    newGenerationsPathFoundBoards.Add(this.FindGoal(startPos, goalPos, newGenBoard));
+                }
+            );
+
+
+            // If we reach goal, return the PathFoundBoard with it's ancestors in a list
+            if (newGenerationsPathFoundBoards.Where(node => node.DistanceFromClosestToGoal == 0).Any())
+            {
+
+                ancestors.Add(
+                    newGenerationsPathFoundBoards.Where(node => node.DistanceFromClosestToGoal == 0).First()
+                );
 
                 return ancestors;
             }
 
-            Console.WriteLine($"Calculation generation {ancestors.Count()}");
-
-            if (candidate.Generation > 3) throw new Exception("Too many generations...");
 
 
-            List<Board> newGenerations = candidate.NewGenerations();
-
-            // new generation get candidate as ancestor.
-            // if we let it be a ref, it can work as linked list. Ancestor has ancestor.
-
-            foreach (Board newGen in newGenerations)
+            // if new generations of current candidate did not reach goal, add them all to the list of candidates
+            foreach (PathFoundBoard newGen in newGenerationsPathFoundBoards)
             {
+                // for every newGen better than previous gen avarage
+                // add as candidate to candidates + list of ancestors (candidate, and candidates ancestors)
 
-                List<Board> newGenAncestors = new List<Board>();
+                List<PathFoundBoard> newGenAncestors = new List<PathFoundBoard>();
 
-                foreach (Board ancestor in ancestors)
-                {
-                    newGenAncestors.Add((Board)ancestor.Clone(false));
-                }
+                newGenAncestors.AddRange(ancestors);
                 newGenAncestors.Add(candidate);
+
                 candidates.Enqueue((newGen, newGenAncestors));
 
-            }
 
+            }
 
         }
 
-        throw new Exception("How did we end up here?");
+        motherBoard.renderField();
+
+
+
+        throw new Exception("Ran out of possible candidate - this was the closed we could get!");
 
     }
 
-    private static Dictionary<string, (int distance, string previousPosition, int distanceFromGoal)> DoDijkstra(string startPos, string goalPos, Board board)
-    {
-        List<Path> paths = board.getPaths();
-        List<string> visited = new List<string>();
-        Dictionary<string, (int distance, string previousPosition, int distanceFromGoal)> distances = new Dictionary<string, (int distance, string previousPosition, int distanceFromGoal)>();
-
-        // usually dijkstra is used on weighted vertices (paths), where it makes sense to recalc the length if a node is revisited.
-        // but in this case, all vertices are equal to 1, so if a node is revisited in a later iteration, it will be a longer path and no need to update.
-        // this we can filter out any nodes already in the distances dictionary.
-
-        // toVisit.Add(startPos);
-        distances[startPos] = (0, startPos, StraightDistance(startPos, goalPos));
-        string current = startPos;
-
-        // as long as there is neighbours found in paths not already added to distances dictionary
-        while (distances.Values.Count() > visited.Count())
-        {
-
-            // add all neighbours to distances dictionary with distance + 1 (that are not already in distances dictionary)
-            List<string> toNeighbours = paths
-                .Where(p => p.From == current &&
-                    !distances.Keys.Contains(p.To))
-                .Select(p => p.To).ToList();
-
-            List<string> fromNeighbours = paths
-                .Where(p => p.To == current &&
-                    !distances.Keys.Contains(p.From))
-                .Select(p => p.From).ToList();
-
-            toNeighbours.AddRange(fromNeighbours);
-            foreach (string neighbour in toNeighbours)
-            {
-                distances[neighbour] = (distances[current].distance + 1, current, StraightDistance(neighbour, goalPos));
-            }
-
-            visited.Add(current);
-
-            // if unvisited neighbours left, visit them to check for unknown neighbours
-            if (distances.Count() > visited.Count())
-            {
-                int shortestDistanceToUnvisitedNode = distances.Where(node => !visited.Contains(node.Key)).Min(node => node.Value.distance);
-                KeyValuePair<string, (int distance, string previousPosition, int distanceFromGoal)> closestNeighbour = distances
-                    .Where(node => !visited.Contains(node.Key) &&
-                           node.Value.distance == shortestDistanceToUnvisitedNode)
-                    .First();
-
-                current = closestNeighbour.Key;
-            }
 
 
-        }
-
-        return distances;
-
-    }
-
-    private static int StraightDistance(string startPos, string goalPos)
-    {
-        // Calc distance in "straight" line between start and goal,
-        // This is the distance if no obstacles/borders are between 2 points
-        // Calculated by moving horisontal, then vertical
-        // ie. From: 1,1 - To: 3,2 - straightDistance: 2 (horisontal) + 1 (vertical) = 3
-
-        int startX = int.Parse(startPos.Split(",")[0]);
-        int startY = int.Parse(startPos.Split(",")[1]);
-        int goalX = int.Parse(goalPos.Split(",")[0]);
-        int goalY = int.Parse(goalPos.Split(",")[1]);
-
-        int distanceX = int.Abs(startX - goalX);
-        int distanceY = int.Abs(startY - goalY);
-
-        return distanceX + distanceY;
-
-
-
-    }
 
     public static void howManyInsertToFindGoal()
     {
         // if dijkstra returns false, try an insertion and rerun until dijkstra returns true.
         // what should it return? How to communicate solution/insertions to make goal available?
+    }
+
+    public void trimCandidates(int limit, ref Queue<(PathFoundBoard pathFoundBoard, List<PathFoundBoard> ancestors)> candidates, int? generation = null)
+    {
+        // trims queue of candidates to the limit by the distance from closest position to goal position
+
+        var orderedCandidates = new Queue<(PathFoundBoard pathFoundBoard, List<PathFoundBoard> ancestors)>();
+
+        if (generation == null)
+        {
+            generation = candidates.Peek().pathFoundBoard.Board.Generation;
+        }
+
+        var candidatesQuery = candidates.Where(c => c.pathFoundBoard.Board.Generation == generation).OrderBy(c => c.pathFoundBoard.DistanceFromClosestToGoal);
+
+
+        foreach (var candidate in candidatesQuery.Take(limit))
+        {
+            orderedCandidates.Enqueue(candidate);
+        }
+
+        // empty queue
+        while (candidates.Any())
+        {
+            candidates.Dequeue();
+        }
+
+        candidates = orderedCandidates;
+
     }
 }
